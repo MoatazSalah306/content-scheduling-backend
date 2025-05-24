@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('timezone')->default('UTC');
+        Schema::table('posts', function (Blueprint $table) {
+            $table->timestamp('published_at')->nullable()->after('scheduled_time');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('posts', function (Blueprint $table) {
+            $table->dropColumn('published_at');
         });
     }
 };

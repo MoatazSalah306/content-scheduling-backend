@@ -17,6 +17,7 @@ class Post extends Model
         'content',
         'image_url',
         'scheduled_time',
+        'published_at',
         'status',
         'user_id'
     ];
@@ -37,18 +38,5 @@ class Post extends Model
             ->withTimestamps();
     }
 
-    public function getScheduledTimeAttribute($value)
-    {
-        $userTimezone = Auth::user()?->timezone;
-
-        return Carbon::parse($value)->setTimezone($userTimezone);
-    }
-
-    public function setScheduledTimeAttribute($value)
-    {
-        $userTimezone = Auth::user()?->timezone;
-
-        $this->attributes['scheduled_time'] = Carbon::parse($value, $userTimezone)->setTimezone('UTC');
-    }
 
 }

@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array<int, class-string|string>
      */
     protected $commands = [
-        \App\Console\Commands\PublishScheduledPosts::class,
+        \App\Console\Commands\PublishPostsCommand::class,
     ];
 
     /**
@@ -21,8 +21,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Example: run posts:publish every minute
-        $schedule->command('posts:publish')->everyMinute();
+        $schedule->command('publish:posts')->everyMinute();
     }
 
     /**
