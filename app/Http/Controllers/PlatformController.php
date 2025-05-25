@@ -61,6 +61,7 @@ class PlatformController extends Controller
                 'id' => $platform->id,
                 'name' => $platform->name,
                 'type' => $platform->type,
+                'character_limit' => $platform->character_limit,
             ];
         });
 

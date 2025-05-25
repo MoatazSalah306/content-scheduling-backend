@@ -6,6 +6,7 @@ use App\Models\Platform;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class PostStoreRequest extends FormRequest
 {
@@ -27,9 +28,13 @@ class PostStoreRequest extends FormRequest
         return [
             'title'          => 'required|string|max:255',
             'content'        => 'required|string',
-            'image_url'      => 'nullable|url',
-            'scheduled_time' => 'required|date|after_or_equal:now',
-            'status'         => 'required|in:draft,scheduled,published',
+            'image'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'scheduled_time' => Rule::when(
+                $this->input('status') === 'scheduled',
+                ['required', 'date', 'after_or_equal:now'],
+                ['nullable']
+            ),
+            'status'         => ['required', Rule::in(['draft', 'scheduled', 'published'])],
             'platforms'      => 'required|array|min:1',
             'platforms.*'    => 'exists:platforms,id',
         ];
@@ -38,8 +43,7 @@ class PostStoreRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $data = $this->validated(); // safe & fresh data
-
+            $data = $this->validated();
             $platforms = Platform::whereIn('id', $data['platforms'] ?? [])->get();
             $contentLength = strlen($data['content'] ?? '');
 
@@ -50,11 +54,18 @@ class PostStoreRequest extends FormRequest
                         "Content exceeds limit ({$platform->character_limit} chars) for {$platform->name}."
                     );
                 }
-
+            }
+            
+            // Add this to ensure proper error response format
+            if ($validator->errors()->any()) {
+                throw new HttpResponseException(response()->json([
+                    'success' => false,
+                    'message' => 'Validation Error',
+                    'errors' => $validator->errors()
+                ], 422));
             }
         });
     }
-
     /**
      * Handle a failed validation attempt.
      */

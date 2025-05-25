@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateProfileRequest;
 use App\Traits\ApiResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,6 +23,7 @@ class ProfileController extends Controller
 
         $data = $request->only(['name', 'email']);
 
+        
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }

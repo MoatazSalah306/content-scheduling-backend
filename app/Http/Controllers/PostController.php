@@ -8,10 +8,11 @@ use App\Models\Post;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
-     use ApiResponse;
+    use ApiResponse;
 
     public function index(Request $request)
     {
@@ -25,6 +26,8 @@ class PostController extends Controller
                 return [
                     'id' => $post->id,
                     'title' => $post->title,
+                    'content' => $post->content,
+                    'status' => $post->status,
                     'scheduled_time' => $post->scheduled_time->toDateTimeString(), // This will use the accessor ( By force using the accessor)
                     'platforms' => $post->platforms,
                 ];
@@ -33,27 +36,64 @@ class PostController extends Controller
         return $this->success($posts, 'User posts');
     }
 
+    public function show(Post $post)
+    {
+        return $this->success($post->load("platforms"), 'Show Post');
+    }
+
     public function store(PostStoreRequest $request)
     {
+        $data = $request->validated();
 
-        
-        $post = auth()->user()->posts()->create($request->validated());
-        $post->platforms()->attach($request->platforms);
+        // Handle image upload if present
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('posts', 'public');
+            $data['image'] = $imagePath; // Assuming 'image' column exists in the posts table
+        }
 
+        Log::info($data);
+        $post = auth()->user()->posts()->create($data);
+        $post->platforms()->attach($data['platforms']);
 
         return $this->success($post->load('platforms'), 'Post created');
     }
 
+
     public function update(PostUpdateRequest $request, Post $post)
     {
 
-        Gate::authorize('modify',$post);
+        Gate::authorize('modify', $post);
 
         if ($post->status === 'published') {
             return $this->error('Cannot update a published post', 422);
         }
 
-        $post->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($post->image) {
+                $oldImagePath = public_path('storage/' . $post->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            // Store the new image
+            $imagePath = $request->file('image')->store('posts', 'public');
+            $data['image'] = $imagePath;
+        } elseif ($request->has('remove_image') && $request->remove_image) { // has the field and equal true or 1
+            // Handle case where user wants to remove the image
+            if ($post->image) {
+                $oldImagePath = public_path('storage/' . $post->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+            $data['image'] = null;
+        }
+
+        $post->update($data);
 
         if ($request->has('platforms')) {
             $post->platforms()->sync($request->platforms);
@@ -64,10 +104,10 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-      
-        Gate::authorize('modify',$post);
+
+        Gate::authorize('modify', $post);
 
         $post->delete();
-        return $this->success([], 'Post deleted',204);
+        return $this->success([], 'Post deleted', 204);
     }
 }
