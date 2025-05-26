@@ -133,6 +133,10 @@ class PostController extends Controller
         Gate::authorize('modify', $post);
 
         $post->delete();
+
+        // Clear the default cache key
+        Cache::forget('user_posts_' . auth()->id() . '_status:all_date:all_page:1');
+
         return $this->success([], 'Post deleted', 204);
     }
 }
