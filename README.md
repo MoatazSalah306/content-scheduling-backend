@@ -13,7 +13,6 @@ This is the Laravel backend implementation for the **Content Scheduler** intervi
 - Analytics endpoints (summary and platform-specific)
 - Profile management (view/update)
 - Rate limiting: Max 10 scheduled posts per day
-- Activity logging (custom implementation)
 - Command/job runner for scheduled publishing
 
 ---
