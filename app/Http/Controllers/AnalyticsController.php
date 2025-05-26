@@ -14,7 +14,7 @@ use Carbon\Carbon;
 class AnalyticsController extends Controller
 {
 
-     use ApiResponse;
+    use ApiResponse;
     /**
      * Get comprehensive analytics data for the authenticated user
      */
@@ -26,16 +26,16 @@ class AnalyticsController extends Controller
 
         // Get posts per platform
         $postsPerPlatform = $this->getPostsPerPlatform($user->id, $startDate);
-        
+
         // Get publishing success rate
         $publishingStats = $this->getPublishingStats($user->id, $startDate);
-        
+
         // Get scheduled vs published counts
         $statusCounts = $this->getStatusCounts($user->id, $startDate);
-        
+
         // Get timeline data for charts
         $timelineData = $this->getTimelineData($user->id, $startDate);
-        
+
         // Get platform performance
         $platformPerformance = $this->getPlatformPerformance($user->id, $startDate);
 
@@ -48,19 +48,21 @@ class AnalyticsController extends Controller
             ];
         });
 
-        return $this->success([
+        $data = [
             'posts_per_platform' => $postsPerPlatform,
             'publishing_stats' => $publishingStats,
             'status_counts' => $statusCounts,
             'timeline_data' => $timelineData,
             'platform_performance' => $platformPerformance,
-            'active_platforms'=> $activePlatforms,
+            'active_platforms' => $activePlatforms,
             'timeframe' => $timeframe,
             'date_range' => [
                 'start' => $startDate->format('Y-m-d'),
                 'end' => Carbon::now()->format('Y-m-d')
             ]
-        ],"Analytics Data Retrieved Successfully.");
+        ];
+        
+        return $this->success($data, "Analytics Data Retrieved Successfully.");
     }
 
     /**
@@ -200,7 +202,7 @@ class AnalyticsController extends Controller
         // Initialize timeline structure
         $timeline = [];
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate->lte(Carbon::now())) {
             $dateStr = $currentDate->format('Y-m-d');
             $timeline[$dateStr] = [
@@ -276,7 +278,7 @@ class AnalyticsController extends Controller
             ->whereDate('platform_post.updated_at', Carbon::today())
             ->count();
 
-        $stats = [
+        $data = [
             'total_posts' => Post::where('user_id', $user->id)->count(),
             'published_today' => $platformPublishedToday,
             'scheduled_posts' => Post::where('user_id', $user->id)
@@ -301,7 +303,7 @@ class AnalyticsController extends Controller
                 ->count()
         ];
 
-        return response()->json($stats);
+        return $this->success($data,"Analytics Stats Retrieved Successfully.");
     }
 
     /**
@@ -330,10 +332,13 @@ class AnalyticsController extends Controller
             ->orderBy('date')
             ->get();
 
-        return response()->json([
+        $data = [
             'platform' => $platform,
             'analytics' => $analytics,
             'timeframe' => $timeframe
-        ]);
+        ];
+
+
+        return $this->success($data,"Platform Analytics Retrieved Successfully.");
     }
 }

@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PostStoreRequest;
 use App\Http\Requests\PostUpdateRequest;
+use App\Jobs\PublishPostJob;
 use App\Models\Post;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -62,11 +65,16 @@ class PostController extends Controller
         }
 
         Log::info($data);
+        
         $post = auth()->user()->posts()->create($data);
         $post->platforms()->attach($data['platforms']);
 
         // Clear the default cache key
         Cache::forget('user_posts_' . auth()->id() . '_status:all_date:all_page:1');
+
+        // Dispatch the PublishPost job with delay
+        PublishPostJob::dispatch($post->id)
+            ->delay($post->scheduled_time);
 
         return $this->success($post->load('platforms'), 'Post created');
     }
@@ -109,9 +117,12 @@ class PostController extends Controller
         $post->update($data);
         Cache::forget('user_posts_' . auth()->id() . '_status:all_date:all_page:1');
 
+        
+
         if ($request->has('platforms')) {
             $post->platforms()->sync($request->platforms);
         }
+
 
         return $this->success($post->load('platforms'), 'Post updated');
     }
