@@ -8,9 +8,7 @@ use App\Jobs\PublishPostJob;
 use App\Models\Post;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -64,7 +62,7 @@ class PostController extends Controller
             $data['image'] = $imagePath; // Assuming 'image' column exists in the posts table
         }
 
-        Log::info($data);
+        // Log::info($data);
         
         $post = auth()->user()->posts()->create($data);
         $post->platforms()->attach($data['platforms']);

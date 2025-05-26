@@ -2,18 +2,20 @@
 
 namespace App\Jobs;
 
+use App\Enums\PostStatusEnum;
 use App\Models\Post;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class PublishPostJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue , Queueable;
 
-    protected $post_id;
+    public $post_id;
 
     /**
      * Create a new job instance.
@@ -28,21 +30,25 @@ class PublishPostJob implements ShouldQueue
      */
     public function handle()
     {
-        $post = Post::with('platforms')->findOrFail($this->post_id);
+        $post = Post::with('platforms')->find($this->post_id);
 
-        if ($post->status !== 'scheduled') {
+        Log::info($post);
+
+        if ($post->status !== "scheduled") {
             Log::warning("Post {$this->post_id} is not in scheduled status. Skipping.");
             return;
         }
+
         
         // Mock publishing to each platform
         foreach ($post->platforms as $platform) {
             $this->publishToPlatform($post, $platform);
         }
 
+    
+        $post->update(['status' => "published","published_at" => Carbon::now()]);
         Log::info("Successfully published post ID: {$post->id}");
            
-        
     }
 
     protected function publishToPlatform($post, $platform)
@@ -55,6 +61,8 @@ class PublishPostJob implements ShouldQueue
         $post->platforms()->updateExistingPivot($platform->id, [
             'platform_status' => $failed ? 'failed' : 'published'
         ]);
+
+        
 
         if ($failed) {
             Log::warning("Failed to publish to {$platform->name}");

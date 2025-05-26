@@ -2,11 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Enums\PostStatusEnum;
 use App\Models\Post;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class PublishScheduledPosts implements ShouldQueue
@@ -39,13 +41,11 @@ class PublishScheduledPosts implements ShouldQueue
 
         foreach ($posts as $post) {
             try {
-                // Update post status to published
-                $post->update(['status' => 'published','published_at'=> now()]);
-
                 // Mock publishing to each platform
                 foreach ($post->platforms as $platform) {
                     $this->publishToPlatform($post, $platform);
                 }
+                $post->update(['status'=>"published",'pubilshed_at'=>Carbon::now()]);
 
                 Log::info("Successfully published post ID: {$post->id}");
             } catch (\Exception $e) {
