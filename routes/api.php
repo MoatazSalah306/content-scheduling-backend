@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\PostController;
@@ -10,6 +11,13 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Analytics routes
+    Route::prefix('analytics')->group(function () {
+        Route::get('/', [AnalyticsController::class, 'index']);
+        Route::get('/quick-stats', [AnalyticsController::class, 'quickStats']);
+        Route::get('/platform/{platformId}', [AnalyticsController::class, 'platformAnalytics']);
+    });
 
     // Basic profile Management ( show and update)
     Route::get('/profile', [ProfileController::class, 'show']);

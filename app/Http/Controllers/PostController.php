@@ -7,6 +7,7 @@ use App\Http\Requests\PostUpdateRequest;
 use App\Models\Post;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -16,22 +17,31 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $posts = Post::with('platforms')
-            ->where('user_id', auth()->id())
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->date, fn($q) => $q->whereDate('scheduled_time', $request->date))
-            ->latest()
-            ->get()
-            ->map(function ($post) {
-                return [
-                    'id' => $post->id,
-                    'title' => $post->title,
-                    'content' => $post->content,
-                    'status' => $post->status,
-                    'scheduled_time' => $post->scheduled_time->toDateTimeString(), // This will use the accessor ( By force using the accessor)
-                    'platforms' => $post->platforms,
-                ];
-            });
+        $cacheKey = 'user_posts_' . auth()->id() . 
+                    '_status:' . ($request->status ?? 'all') . 
+                    '_date:' . ($request->date ?? 'all') . 
+                    '_page:' . ($request->page ?? 1);
+
+        $cacheDuration = now()->addMinutes(3); 
+
+        $posts = Cache::remember($cacheKey, $cacheDuration, function () use ($request) {
+            return Post::with('platforms')
+                ->where('user_id', auth()->id())
+                ->when($request->status, fn($q) => $q->where('status', $request->status))
+                ->when($request->date, fn($q) => $q->whereDate('scheduled_time', $request->date))
+                ->latest()
+                ->get()
+                ->map(function ($post) {
+                    return [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                        'content' => $post->content,
+                        'status' => $post->status,
+                        'scheduled_time' => $post->scheduled_time ? $post->scheduled_time->toDateTimeString() : null,
+                        'platforms' => $post->platforms,
+                    ];
+                });
+        });
 
         return $this->success($posts, 'User posts');
     }
