@@ -42,13 +42,13 @@ This is the Laravel backend implementation for a **Content Scheduler** system. I
 
 ---
 
-## 🛠Scheduled Publishing Command
+## Scheduled Publishing Command
 
 A Laravel command handles publishing scheduled posts using queue workers.
 
 ```bash
 php artisan publish:posts
-
+```
 ---
 
 ## Installation & Setup
