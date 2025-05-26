@@ -120,3 +120,20 @@ This Command runs the Platforms seeder only :
 
 *This approach balances simplicity, performance, maintainability, and scalability for the project’s scope.*
 
+---
+
+A Laravel command handles publishing scheduled posts using queue workers.
+
+To run the command that checks all past scheduled posts and publishes them, run:
+
+```bash
+php artisan publish:posts
+```
+
+---
+
+To test the single job for a post, start the queue worker with running :
+```bash
+php artisan queue:work
+```
+When the scheduled_time for a post arrives, the job will be dispatched and processed automatically.
