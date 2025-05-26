@@ -12,7 +12,8 @@ This is the Laravel backend implementation for a **Content Scheduler** system. I
 - Platform management and toggling
 - Analytics endpoints (summary and platform-specific)
 - Profile management (view/update)
-- Rate limiting: Max 10 scheduled posts per day & platforms toggling ( 5 toggles per minute )
+- Rate limiting: Max 10 scheduled posts per day. ( via PostStoreRequest ).
+- Rate limiting on platforms toggling (5 toggles per minute) .
 - Command/job runner for scheduled publishing
 
 ---
