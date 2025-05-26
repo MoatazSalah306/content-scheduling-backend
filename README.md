@@ -48,3 +48,14 @@ A Laravel command handles publishing scheduled posts using queue workers.
 
 ```bash
 php artisan publish:posts
+
+---
+
+## Installation & Setup
+
+```bash
+git clone <repo-url>
+cp .env.example .env
+composer install
+php artisan migrate --seed
+php artisan serve
