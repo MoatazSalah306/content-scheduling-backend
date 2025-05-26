@@ -3,9 +3,14 @@
 namespace App\Http\Requests;
 
 use App\Models\Platform;
+use App\Models\Post;
+use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Carbon as SupportCarbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class PostStoreRequest extends FormRequest
@@ -54,6 +59,25 @@ class PostStoreRequest extends FormRequest
                         "Content exceeds limit ({$platform->character_limit} chars) for {$platform->name}."
                     );
                 }
+            }
+
+             // ✅ Daily post limit validation
+            if (($data['status'] ?? null) === 'scheduled' && isset($data['scheduled_time'])) {
+                $scheduledDate = Carbon::parse($data['scheduled_time'])->toDateString();
+               
+                $user = Auth::user();
+
+                $scheduledPostsCount = Post::where('user_id', $user->id)
+                    ->whereDate('scheduled_time', $scheduledDate)
+                    ->count();
+
+                if ($scheduledPostsCount >= 10) {
+                    $validator->errors()->add(
+                        'scheduled_time',
+                        'You have reached the daily limit of 10 scheduled posts.'
+                    );
+                }
+                //  Log::info($scheduledDate);
             }
             
             // Add this to ensure proper error response format

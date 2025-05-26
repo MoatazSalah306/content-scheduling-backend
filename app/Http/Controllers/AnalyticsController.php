@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Models\Platform;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,8 @@ use Carbon\Carbon;
 
 class AnalyticsController extends Controller
 {
+
+     use ApiResponse;
     /**
      * Get comprehensive analytics data for the authenticated user
      */
@@ -45,7 +48,7 @@ class AnalyticsController extends Controller
             ];
         });
 
-        return response()->json([
+        return $this->success([
             'posts_per_platform' => $postsPerPlatform,
             'publishing_stats' => $publishingStats,
             'status_counts' => $statusCounts,
@@ -57,7 +60,7 @@ class AnalyticsController extends Controller
                 'start' => $startDate->format('Y-m-d'),
                 'end' => Carbon::now()->format('Y-m-d')
             ]
-        ]);
+        ],"Analytics Data Retrieved Successfully.");
     }
 
     /**
