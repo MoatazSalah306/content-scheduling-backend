@@ -22,7 +22,7 @@ class PostController extends Controller
                     '_date:' . ($request->date ?? 'all') . 
                     '_page:' . ($request->page ?? 1);
 
-        $cacheDuration = now()->addMinutes(3); 
+        $cacheDuration = now()->addMinutes(1); 
 
         $posts = Cache::remember($cacheKey, $cacheDuration, function () use ($request) {
             return Post::with('platforms')
@@ -65,6 +65,9 @@ class PostController extends Controller
         $post = auth()->user()->posts()->create($data);
         $post->platforms()->attach($data['platforms']);
 
+        // Clear the default cache key
+        Cache::forget('user_posts_' . auth()->id() . '_status:all_date:all_page:1');
+
         return $this->success($post->load('platforms'), 'Post created');
     }
 
@@ -104,6 +107,7 @@ class PostController extends Controller
         }
 
         $post->update($data);
+        Cache::forget('user_posts_' . auth()->id() . '_status:all_date:all_page:1');
 
         if ($request->has('platforms')) {
             $post->platforms()->sync($request->platforms);
