@@ -3,7 +3,7 @@
 This is the Laravel backend implementation for a **Content Scheduler** system. It provides a RESTful API to support scheduling, publishing, and managing social media posts across multiple platforms.
 
 ---
-API Documentation URl: 
+API Documentation URL: 
 ```bash
 https://apidog.com/apidoc/shared/6f9c675c-a761-472d-954c-4fb17db8f80b
 ```
