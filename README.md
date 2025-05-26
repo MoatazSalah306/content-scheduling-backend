@@ -1,61 +1,152 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Content Scheduler Backend (PHP/Laravel)
+Overview
+This repository contains the backend implementation of the Content Scheduler application, developed as part of the GetPayIn Backend Developer Coding Challenge. Built with PHP 8.1 and Laravel 11, the application enables users to create, schedule, and manage posts across multiple social media platforms. The codebase prioritizes clean architecture, performance optimization, and robust feature implementation, adhering to SOLID principles and modern development practices.
+Features
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Authentication: Secure user registration, login, and logout using Laravel Sanctum with token-based authentication.
+Post Management:
+Create, read, update, and delete posts with title, content, optional image URL, scheduled time, and platform selection.
+Filter posts by status (draft, scheduled, published) and date.
+Validation for platform-specific requirements (e.g., character limits for Twitter, Instagram, LinkedIn).
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Platform Management:
+List all available platforms (Twitter, Instagram, LinkedIn, etc.).
+Toggle active platforms for users and retrieve enabled platforms.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Scheduling:
+A Laravel command (php artisan publish:posts) and queued job to process due posts.
+Mocked publishing process to simulate posting to social platforms.
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Creative Features:
+Post Analytics: Provides detailed analytics via /analytics, /analytics/quick-stats, and /analytics/platform/{platformId} endpoints, including posts per platform, publishing success rate, and scheduled vs. published counts.
+Rate Limiting: Restricts users to 10 scheduled posts per day using Laravel's throttle middleware.
+Activity Logging: Logs user actions (e.g., post creation, updates) for auditability using a custom logging system.
+Custom Feature: Scheduled post preview generation for each platform to ensure content compliance before publishing.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
+Tech Stack
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Framework: Laravel 11
+Language: PHP 8.1
+Database: MySQL (with migrations and seeders)
+Authentication: Laravel Sanctum
+Queue: Laravel Queue with Redis for job processing
+Testing: PHPUnit for unit and feature tests
+Caching: Laravel Cache (Redis driver) for optimized API responses
 
-### Premium Partners
+Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Clone the Repository:
+git clone https://github.com/yourusername/content-scheduler-backend.git
+cd content-scheduler-backend
 
-## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Install Dependencies:
+composer install
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Configure Environment:
 
-## Security Vulnerabilities
+Copy .env.example to .env and update the following:
+Database credentials (DB_*)
+Redis configuration (REDIS_*)
+App URL (APP_URL)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+Run Migrations and Seeders:
+php artisan migrate --seed
+
+
+Set Up Queue Worker:
+php artisan queue:work --queue=default
+
+
+Start the Development Server:
+php artisan serve
+
+
+Run Scheduled Tasks (for post publishing):
+php artisan publish:posts
+
+
+
+API Endpoints
+Authentication
+
+POST /api/register - Register a new user
+POST /api/login - Authenticate a user and return a token
+POST /api/logout - Log out the authenticated user
+GET /api/profile - Get authenticated user profile
+PUT /api/profile - Update user profile
+
+Posts
+
+GET /api/posts - List user's posts (with filters: status, date)
+POST /api/posts - Create a new post
+GET /api/posts/{id} - Get a specific post
+PUT /api/posts/{id} - Update a scheduled post
+DELETE /api/posts/{id} - Delete a post
+
+Platforms
+
+GET /api/platforms - List available platforms
+POST /api/platforms/toggle - Toggle active platforms for the user
+GET /api/platforms/getActive - Get enabled platforms for the user
+
+Analytics
+
+GET /api/analytics - Get detailed analytics for posts
+GET /api/analytics/quick-stats - Get quick statistics (e.g., total posts, success rate)
+GET /api/analytics/platform/{platformId} - Get analytics for a specific platform
+
+Performance Optimizations
+
+Eloquent Query Optimization: Efficient use of eager loading (with) to minimize N+1 queries.
+Caching: API responses cached using Redis for frequently accessed data (e.g., platform lists, analytics).
+Queueing: Post publishing handled asynchronously via Laravel queues with Redis to ensure scalability.
+Database Indexing: Indexes on frequently queried columns (scheduled_time, status, user_id) for faster retrieval.
+
+Code Quality
+
+SOLID Principles: Modular design with service classes, repositories, and DTOs for clear separation of concerns.
+Type Safety: Use of PHP type hints and strict typing.
+Documentation: PHPDoc comments for all major classes and methods.
+Testing: Comprehensive PHPUnit tests covering models, controllers, and jobs.
+Validation: Robust request validation with custom rules for platform-specific constraints.
+
+Security
+
+Authentication: Sanctum ensures secure token-based authentication.
+Rate Limiting: Throttle middleware limits excessive API calls (e.g., 10 posts/day).
+Input Validation: Strict validation to prevent injection attacks.
+CSRF Protection: Laravel's built-in CSRF protection for form submissions.
+
+Trade-Offs
+
+Mocked Publishing: A mocked publishing process was implemented to focus on scheduling logic, as per the challenge requirements.
+Caching Strategy: Redis was chosen for performance, though file-based caching could be an alternative for simpler deployments.
+Activity Logging: Stored in the database for persistence, which may impact performance under high load; a future improvement could involve offloading logs to a dedicated logging service.
+
+Video Demo
+A video walkthrough of the project is available here. It demonstrates:
+
+User registration, login, and logout
+Post creation, scheduling, and updating
+Platform toggling and retrieval of active platforms
+Analytics dashboard and scheduled post processing via php artisan publish:posts
+
+Future Improvements
+
+Integration with real social media APIs for actual publishing.
+Advanced analytics with visual charts using a library like Chart.js.
+Support for bulk post scheduling and recurring posts.
+
+Contact
+For any questions, please reach out to Mohamed Salah at msalahbussines2005@gmail.com.
+Thank you for reviewing my submission!
