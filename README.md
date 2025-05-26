@@ -54,7 +54,7 @@ php artisan publish:posts
 ## Installation & Setup
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/MoatazSalah306/content-scheduling-backend.git
 cp .env.example .env
 composer install
 php artisan migrate --seed
