@@ -1,10 +1,10 @@
-# 📡 Content Scheduler API – Backend
+# Content Scheduler API – Backend
 
 This is the Laravel backend implementation for the **Content Scheduler** interview challenge from [GetPayIn](https://getpayin.com). It provides a RESTful API to support scheduling, publishing, and managing social media posts across multiple platforms.
 
 ---
 
-## 🚀 Features
+## Features
 
 - User authentication with **Laravel Sanctum**
 - CRUD for Posts with platform associations
@@ -18,7 +18,7 @@ This is the Laravel backend implementation for the **Content Scheduler** intervi
 
 ---
 
-## 📌 API Routes
+## API Routes
 
 | Method | Endpoint                          | Description |
 |--------|-----------------------------------|-------------|
@@ -43,7 +43,7 @@ This is the Laravel backend implementation for the **Content Scheduler** intervi
 
 ---
 
-## 🛠️ Scheduled Publishing Command
+## 🛠Scheduled Publishing Command
 
 A Laravel command handles publishing scheduled posts using queue workers.
 
