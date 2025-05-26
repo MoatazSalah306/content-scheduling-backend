@@ -1,6 +1,6 @@
 # 📡 Content Scheduler API – Backend
 
-This is the Laravel 11 backend implementation for the **Content Scheduler** interview challenge from [GetPayIn](https://getpayin.com). It provides a RESTful API to support scheduling, publishing, and managing social media posts across multiple platforms.
+This is the Laravel backend implementation for the **Content Scheduler** interview challenge from [GetPayIn](https://getpayin.com). It provides a RESTful API to support scheduling, publishing, and managing social media posts across multiple platforms.
 
 ---
 
