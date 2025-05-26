@@ -62,9 +62,13 @@ php artisan migrate --seed
 php artisan serve
 ```
 This Command runs the Analytics seeder to be able to test the analytics :
-```php artisan db:seed --class=AnalyticsSeeder ```
+```bash
+php artisan db:seed --class=AnalyticsSeeder
+```
 This Command runs the Platforms seeder only :
- ```php artisan migrate --seed ```
+```bash
+php artisan migrate --seed
+```
 
 
 
@@ -120,3 +124,20 @@ This Command runs the Platforms seeder only :
 
 *This approach balances simplicity, performance, maintainability, and scalability for the project’s scope.*
 
+---
+
+A Laravel command handles publishing scheduled posts using queue workers.
+
+To run the command that checks all past scheduled posts and publishes them, run:
+
+```bash
+php artisan publish:posts
+```
+
+---
+
+To test the single job for a post, start the queue worker with running :
+```bash
+php artisan queue:work
+```
+When the scheduled_time for a post arrives, the job will be dispatched and processed automatically.
