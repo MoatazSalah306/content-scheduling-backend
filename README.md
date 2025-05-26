@@ -12,7 +12,7 @@ This is the Laravel backend implementation for a **Content Scheduler** system. I
 - Platform management and toggling
 - Analytics endpoints (summary and platform-specific)
 - Profile management (view/update)
-- Rate limiting: Max 10 scheduled posts per day
+- Rate limiting: Max 10 scheduled posts per day & platforms toggling ( 5 toggles per minute )
 - Command/job runner for scheduled publishing
 
 ---
@@ -60,5 +60,5 @@ composer install
 php artisan migrate --seed
 php artisan serve
 ```
-This Command runs the Analytics seeder to be able to test the analytics : ```bash php artisan db:seed --class=AnalyticsSeeder ```
-This Command runs the Platforms seeder only : ```bash php artisan migrate --seed ```
+This Command runs the Analytics seeder to be able to test the analytics : ```php artisan db:seed --class=AnalyticsSeeder ```
+This Command runs the Platforms seeder only : ```php artisan migrate --seed ```
