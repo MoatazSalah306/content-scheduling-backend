@@ -59,3 +59,6 @@ cp .env.example .env
 composer install
 php artisan migrate --seed
 php artisan serve
+```
+This Command runs the Analytics seeder to be able to test the analytics : ```bash php artisan db:seed --class=AnalyticsSeeder ```
+This Command runs the Platforms seeder only : ```bash php artisan migrate --seed ```
